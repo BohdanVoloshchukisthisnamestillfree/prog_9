@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int part_of_array_sum(int *array, int steps, int flag)
+  {
+    int sum = 0;
+    for (int i = 0; i < flag; ++i)
+     {
+        sum += array[steps-flag];// процес додавання кроків
+     }
+      return sum;
+  }
+
+
+int factorial(int dist)
+  {
+    int flag = 0;
+    int factorial = 1;
+    int n = 0;
+    while(!flag) 
+      {
+        n++;
+        factorial *= n;
+        if (factorial > dist)
+         {
+            factorial--;
+            flag = 1;
+         }
+      }
+    return n, factorial, dist - factorial;
+  }
+
+
+// функція для розрахунку мінімальної кількості кроків
+int calculateSteps(int x, int y)
+  {
+    int steps = 3; // кількість ходів
+    int dist = y-x;
+    int n, factor, sum = factorial(dist);
+
+    if (dist == 1)
+        return 1;  
+    if (dist == 2)
+        return 2;  
+    if (dist == 3||dist == 4)
+        return 3;  
+        
+
+    int flag = 1;
+    int *array = malloc(steps * sizeof(int));
+    array[0], array[1] = 1;
+            
+    while (sum != 0)
+         {//працюватиме поки загальна сума не дорівнюватиме 0,
+         //далі буде приймати відємні числа, тому вона змешується
+              int *temp = realloc(array, steps * sizeof(int)); 
+              //після того як у двійковій системі досягнуто максимуму переходиться 1 вліво 0011 + 0001 = 0100
+              array = temp;
+              array[steps-1] = 1;//надаємо найправішому місцю значення 1
+              if (array[steps-flag] < flag)
+                 {
+                   for (int i = 1; i <= flag; i++)
+                      {//цикл у якому на певному місце досягається максимум, якщо загальна сума не стає 0
+                          array[steps-flag] = i;//присвоюємо номеру місця значення місця
+                          if (sum == part_of_array_sum(array, steps, flag))
+                          {//якщо параметр сума стає рівною 0 - виходимо 
+                          break;
+                          } 
+                      }
+                 }    
+        flag++;//збільшуємо номер місця, для якого шукаємо оптимальну величину
+        steps++;//загальна кількість кроків
+        
+        }
+    free(array);//звільняємо  масив виділеної пам"яті
+
+    return steps;
+  }
+
+int main() 
+  {
+    int x, y; // ввод значень країв діапазону
+    printf("Enter the value of x: ");
+    scanf("%d", &x);
+    printf("Enter the value of y: ");
+    scanf("%d", &y);
+
+    // перевірка правильності вводу значень
+    if (x < 0 || y < 0 || y >= pow(2, 31) || x > y) 
+     {
+        printf("Invalid input.\n");
+        return 1; 
+     }
+
+    // обчислюємо і виводимо мінімальну кількість кроків
+    int result = calculateSteps(x, y);
+    printf("Minimum number of steps: %d\n", result);
+
+    return 0;
+  }
